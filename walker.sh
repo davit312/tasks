@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# this script walks through given path and recursively show all files
+# containing in folder as script argument
 
 
 walk() {
