@@ -1,0 +1,17 @@
+---
+- name: Configuring host
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: Installing 'docker' and 'docker-compose'
+    apt:
+      update_cache: yes
+      name:
+        - docker.io
+        - docker-compose
+  - name: Creating webserver image
+    shell:
+      chdir: /vagrant
+      cmd: docker build -f Dockerfile-webserver -t apache-php-webserver .
+...

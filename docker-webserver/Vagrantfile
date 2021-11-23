@@ -1,0 +1,15 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "hashicorp/bionic64"
+
+  config.vm.network "forwarded_port", guest: 8000, host: 8080
+
+  config.vm.provision "First boot configuration", type: "ansible",
+    playbook: "vm.first-boot.yaml"
+
+  config.vm.provision "Starting server containers", type: "shell", run: "always",
+    inline: "cd /vagrant; docker-compose up -d"
+
+end
