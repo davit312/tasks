@@ -9,10 +9,13 @@ variable AWS_REGION {}
 variable AWS_ACCESS_KEY {}
 variable AWS_SECRET_KEY {}
 
+
 variable vpc_cidr_block {}
 variable subnet_cidr_block {}
 variable avail_zone {}
 variable env_prefix {}
+variable trusted_ip {}
+
 
 resource "aws_vpc" "app-vpc" {
   cidr_block = var.vpc_cidr_block
@@ -49,11 +52,45 @@ resource "aws_default_route_table" "app-main-rtb" {
   }
 }
 
-resource "aws_security_group" "app-sg" {
-  name = "app-sg"
+resource "aws_default_security_group" "default-sg" {
   vpc_id = aws_vpc.app-vpc.id
 
   ingress {
-    
+    description = "Allow ssh"
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [var.trusted_ip]
   }
+
+
+  ingress {
+    description = "Allow HTTP"
+    from_port = 8080
+    to_port = 8080
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Allow HTTP /quick/"
+    from_port = 8080
+    to_port = 8080
+    protocol = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow all outgoing traffic"
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    prefix_list_ids = [ ]
+  }
+
+  tags = {
+    Name: "${var.env_prefix}-default-sg"
+  }
+
 }
